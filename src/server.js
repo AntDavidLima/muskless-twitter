@@ -1,34 +1,32 @@
 import http from 'node:http';
 
 import { json } from './middlewares/json.js';
-import { Database } from './database.js';
-import { randomUUID } from 'node:crypto';
-
-const database = new Database();
+import { routes } from './routes.js';
 
 const server = http.createServer(async (request, response) => {
   const { method, url } = request;
 
   await json(request, response);
 
-  if (method === 'GET' && url === '/posts') {
-    const posts = database.select('posts');
-    return response.end(JSON.stringify(posts));
+  const routeResource = routes.find((route) => route.resource.test(url));
+
+  if (routeResource === undefined) {
+    return response.writeHead(404).end(JSON.stringify('Resource not found'));
   }
 
-  if (method === 'POST' && url === '/posts') {
-    const { userId, content } = request.body;
+  const routeMethod = routeResource[method];
 
-    const post = database.insert('posts', {
-      id: randomUUID(),
-      userId,
-      content,
-    });
-
-    return response.writeHead(201).end(JSON.stringify(post));
+  if (routeMethod === undefined) {
+    return response
+      .writeHead(501)
+      .end(JSON.stringify('Method not implemented'));
   }
 
-  return response.writeHead(404).end('Pagina não encontrada');
+  const routeParams = url.match(routeResource.resource);
+
+  request.params = { ...routeParams.groups };
+
+  return routeMethod.handler(request, response);
 });
 
 server.listen(3333);
