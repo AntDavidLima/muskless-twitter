@@ -27,7 +27,17 @@ export class Database {
     return data;
   }
 
-  select(table) {
+  select(table, search) {
+    if (search) {
+      const result = this.#database[table].filter((row) =>
+        Object.entries(search).some(([key, value]) =>
+          row[key].toLowerCase().includes(value.toLowerCase())
+        )
+      );
+
+      return result;
+    }
+
     return this.#database[table] ?? [];
   }
 

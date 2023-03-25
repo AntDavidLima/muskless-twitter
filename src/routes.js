@@ -10,7 +10,12 @@ export const routes = [
     resource: buildRoutePath('/posts'),
     GET: {
       handler: (request, response) => {
-        const posts = database.select('posts');
+        const { search } = request.query;
+
+        const posts = database.select(
+          'posts',
+          search ? { content: search } : null
+        );
 
         return response.end(JSON.stringify(posts));
       },
