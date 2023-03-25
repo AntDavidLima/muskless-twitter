@@ -30,10 +30,32 @@ export const routes = [
     },
   },
   {
-    resource: buildRoutePath('/posts/:id/test/:testId'),
+    resource: buildRoutePath('/posts/:id'),
     DELETE: {
       handler: (request, response) => {
-        return response.end('ok');
+        const { id } = request.params;
+
+        const success = database.delete('posts', id);
+
+        if (success) {
+          return response.writeHead(204).end();
+        }
+
+        return response.writeHead(404).end();
+      },
+    },
+    PUT: {
+      handler: (request, response) => {
+        const { id } = request.params;
+        const { content } = request.body;
+
+        const post = database.update('posts', id, { content });
+
+        if (post) {
+          return response.end(JSON.stringify(post));
+        }
+
+        return response.writeHead(404).end();
       },
     },
   },

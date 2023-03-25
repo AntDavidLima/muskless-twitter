@@ -11,15 +11,13 @@ const server = http.createServer(async (request, response) => {
   const routeResource = routes.find((route) => route.resource.test(url));
 
   if (routeResource === undefined) {
-    return response.writeHead(404).end(JSON.stringify('Resource not found'));
+    return response.writeHead(404).end();
   }
 
   const routeMethod = routeResource[method];
 
   if (routeMethod === undefined) {
-    return response
-      .writeHead(501)
-      .end(JSON.stringify('Method not implemented'));
+    return response.writeHead(501);
   }
 
   const routeParams = url.match(routeResource.resource);
