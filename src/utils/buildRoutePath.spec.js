@@ -157,4 +157,26 @@ describe('Route path building', () => {
 
     expect(match).toBe(false);
   });
+
+  it('should extract the path params to an object', () => {
+    const pathRegex = buildRoutePath('/resource/:param1/subResource/:param2');
+
+    const url = '/resource/value1/subResource/value2';
+
+    const params = url.match(pathRegex);
+
+    expect(params.groups).toMatchObject({ param1: 'value1', param2: 'value2' });
+  });
+
+  it('should extract the query params to an unique string', () => {
+    const pathRegex = buildRoutePath('/resource');
+
+    const url = '/resource?param1=value1&param2=value2';
+
+    const params = url.match(pathRegex);
+
+    expect(params.groups.query).toStrictEqual('?param1=value1&param2=value2');
+
+    console.log(params);
+  });
 });
