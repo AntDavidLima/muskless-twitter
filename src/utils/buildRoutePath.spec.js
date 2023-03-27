@@ -132,10 +132,28 @@ describe('Route path building', () => {
     expect(match).toBe(true);
   });
 
-  it('should not match a path with a query param without a value', () => {
+  it('should not match a path with a query param that does not has a value', () => {
     const pathRegex = buildRoutePath('/resource');
 
     const match = pathRegex.test('/resource?param1');
+
+    expect(match).toBe(false);
+  });
+
+  it('should not match a path that does not separate the query params with an &', () => {
+    const pathRegex = buildRoutePath('/resource');
+
+    const match = pathRegex.test(
+      '/resource?param1=value1param2=value2&param3=value3'
+    );
+
+    expect(match).toBe(false);
+  });
+
+  it('should not match a path with a ? and no params', () => {
+    const pathRegex = buildRoutePath('/resource');
+
+    const match = pathRegex.test('/resource?');
 
     expect(match).toBe(false);
   });
